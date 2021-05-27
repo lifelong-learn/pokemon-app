@@ -4,11 +4,7 @@ import {
   AppBar,
   Toolbar,
   Container,
-  Typography,
   Grid,
-  Card,
-  CardMedia,
-  CardContent,
   CircularProgress,
   TextField
 } from '@material-ui/core';
@@ -26,7 +22,11 @@ const Pokedex = (props) => {
   console.log();
   useEffect(() => {
     axios
-      .get(process.env.REACT_APP_POKEDEX_DATA_API)
+      .request({
+        method: "get",
+        url: process.env.REACT_APP_POKEDEX_DATA_API,
+        crossDomain: true
+      })
       .then(response => response.data.results)
       .then(results => {
         const newPokemonData = {};
