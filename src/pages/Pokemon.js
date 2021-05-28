@@ -26,6 +26,7 @@ const Pokemon = (props) => {
   }, [pokemonId]);
 
   const generatePokemonJSX = () => {
+    console.log(pokemon);
     const {
       name,
       id,
