@@ -42,11 +42,11 @@ const Pokemon = (props) => {
         <Typography variant="h2">
           {`${id}. ${name.toUpperCase()}`}
         </Typography>
-        {/* <img
+        <img
           width="500"
           src={fullImageUrl}
           title={name}
-        /> */}
+        />
         <Typography variant="h3">
           Pokemon Info
         </Typography>
