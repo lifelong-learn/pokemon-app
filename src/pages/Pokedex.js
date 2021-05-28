@@ -19,14 +19,9 @@ const Pokedex = (props) => {
   const [pokemonData, setPokemonData] = useState();
   const [filter, setFilter] = useState('');
 
-  console.log();
   useEffect(() => {
     axios
-      .request({
-        method: "get",
-        url: process.env.REACT_APP_POKEDEX_DATA_API,
-        crossDomain: true
-      })
+      .get(process.env.REACT_APP_POKEDEX_DATA_API)
       .then(response => response.data.results)
       .then(results => {
         const newPokemonData = {};
