@@ -13,11 +13,11 @@ const PokemonCard = (props) => {
         className={classes.card}
         onClick={() => history.push(`/${id}`)}
       >
-        {/* <CardMedia
+        <CardMedia
           className={classes.cardMedia}
           image={sprite}
           title={name}
-        /> */}
+        />
         <CardContent>
           <Typography variant="subtitle1" align="center">{`${id}. ${name.toUpperCase()}`}</Typography>
         </CardContent>
