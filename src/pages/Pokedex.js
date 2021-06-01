@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import {
   AppBar,
@@ -15,9 +15,20 @@ import useStyles from '../styles';
 
 const Pokedex = (props) => {
   const { history } = props;
+
   const classes = useStyles();
   const [pokemonData, setPokemonData] = useState();
   const [filter, setFilter] = useState('');
+  const [displayCount, setDisplayCount] = useState(18);
+  const loadingRef = useRef(null);
+
+  const showMorePokemon = useCallback((entries) => {
+    const [entry] = entries;
+    if (entry.isIntersecting &&
+      displayCount < Object.values(pokemonData).length) {
+      setDisplayCount(displayCount + 9);
+    }
+  });
 
   useEffect(() => {
     axios
@@ -40,11 +51,33 @@ const Pokedex = (props) => {
       .catch((err) => console.log(err));
   }, []);
 
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 1.0
+    }
+
+    const observer = new IntersectionObserver(showMorePokemon, options);
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current)
+    }
+
+    return () => {
+      if (loadingRef.current) {
+        observer.unobserve(loadingRef.current)
+      }  
+    };
+  }, [showMorePokemon]);
+
   const handleSearchChange = (event) => {
     const pokeFilter = event.target.value;
     setFilter(pokeFilter.toLowerCase());
+    setDisplayCount(9);
   };
- 
+
+  console.log(`# of pokemons displayed: ${displayCount}`);
   return (
     <>
       <AppBar position="static">
@@ -61,13 +94,17 @@ const Pokedex = (props) => {
       <Container maxWidth="sm">
         { pokemonData ?
           (<Grid container spacing={2} className={classes.cardGrid}>
-              {Object.keys(pokemonData).map(pokemonId => (
-                pokemonData[pokemonId].name.includes(filter) &&
-                (<PokemonCard key={pokemonId}
-                  pokemon={pokemonData[pokemonId]}
-                  history={history}
-                />)))
+              {Object.values(pokemonData)
+                .filter(pokemon => pokemon.name.includes(filter))
+                .slice(0, displayCount)
+                .map(pokemon => (
+                  <PokemonCard key={pokemon.id}
+                    pokemon={pokemon}
+                    history={history}
+                  />)
+                )
               }
+              <div ref={loadingRef}><CircularProgress /></div>
             </Grid>) :
           <div className={classes.progress}>
             <CircularProgress />
