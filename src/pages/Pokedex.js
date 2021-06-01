@@ -77,7 +77,6 @@ const Pokedex = (props) => {
     setDisplayCount(9);
   };
 
-  console.log(`# of pokemons displayed: ${displayCount}`);
   return (
     <>
       <AppBar position="static">
