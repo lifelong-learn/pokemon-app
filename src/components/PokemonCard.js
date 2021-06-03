@@ -14,7 +14,7 @@ const PokemonCard = (props) => {
         onClick={() => history.push(`/${id}`)}
       >
         <CardMedia
-          className={classes.cardMedia}
+          className={classes.cardMediaPokedex}
           image={sprite}
           title={name}
         />

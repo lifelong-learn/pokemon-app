@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
   AppBar,
@@ -15,20 +15,12 @@ import useStyles from '../styles';
 
 const Pokedex = (props) => {
   const { history } = props;
-
+  const numOfPokemonPerScroll = 18;
   const classes = useStyles();
   const [pokemonData, setPokemonData] = useState();
   const [filter, setFilter] = useState('');
-  const [displayCount, setDisplayCount] = useState(18);
+  const [displayCount, setDisplayCount] = useState(numOfPokemonPerScroll);
   const loadingRef = useRef(null);
-
-  const showMorePokemon = useCallback((entries) => {
-    const [entry] = entries;
-    if (entry.isIntersecting &&
-      displayCount < Object.values(pokemonData).length) {
-      setDisplayCount(displayCount + 9);
-    }
-  });
 
   useEffect(() => {
     axios
@@ -58,23 +50,28 @@ const Pokedex = (props) => {
       threshold: 1.0
     }
 
-    const observer = new IntersectionObserver(showMorePokemon, options);
+    const handleIntersection = (entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting &&
+        displayCount < Object.values(pokemonData).length) {
+        setDisplayCount(displayCount => displayCount + numOfPokemonPerScroll);
+      }
+    };
 
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current)
-    }
+    const observer = new IntersectionObserver(handleIntersection, options);
+
+    if (loadingRef.current)
+      observer.observe(loadingRef.current);
 
     return () => {
-      if (loadingRef.current) {
-        observer.unobserve(loadingRef.current)
-      }  
+      observer.disconnect();
     };
-  }, [showMorePokemon]);
+  });
 
   const handleSearchChange = (event) => {
     const pokeFilter = event.target.value;
     setFilter(pokeFilter.toLowerCase());
-    setDisplayCount(9);
+    setDisplayCount(numOfPokemonPerScroll);
   };
 
   return (
@@ -91,24 +88,25 @@ const Pokedex = (props) => {
         </Toolbar>
       </AppBar>
       <Container maxWidth="sm">
-        { pokemonData ?
-          (<Grid container spacing={2} className={classes.cardGrid}>
-              {Object.values(pokemonData)
-                .filter(pokemon => pokemon.name.includes(filter))
-                .slice(0, displayCount)
-                .map(pokemon => (
-                  <PokemonCard key={pokemon.id}
-                    pokemon={pokemon}
-                    history={history}
-                  />)
-                )
-              }
-              <div ref={loadingRef}><CircularProgress /></div>
-            </Grid>) :
-          <div className={classes.progress}>
-            <CircularProgress />
-          </div>
+        { pokemonData && (
+          <Grid container spacing={2} className={classes.cardGrid}>
+            {Object.values(pokemonData)
+              .filter(pokemon => pokemon.name.includes(filter))
+              .slice(0, displayCount)
+              .map((pokemon) => (
+                <PokemonCard key={pokemon.id}
+                  pokemon={pokemon}
+                  history={history}
+                />)
+              )
+            }
+          </Grid>
+          )
         }
+        <div ref={pokemonData ? loadingRef : null} className={classes.progress}>
+          {pokemonData && (displayCount < Object.values(pokemonData).length) ?
+            <CircularProgress /> : ''}
+        </div>
       </Container>
     </>
   );

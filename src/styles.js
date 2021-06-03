@@ -24,10 +24,16 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  cardMedia: {
+  cardMediaPokedex: {
     height: '144px',
     width: '144px',
     margin: '0px auto'
+  },
+  cardMediaPokemon: {
+    height: '500px',
+    width: '500px',
+    margin: '0px auto',
+    backgroundSize: 'contain'
   },
   cardContent: {
     flexGrow: 1,
